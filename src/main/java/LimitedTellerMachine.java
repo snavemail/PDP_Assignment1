@@ -4,15 +4,22 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import teller.TellerMachine;
 
+/**
+ * Class that represents a limited teller machine. This machine only accepts these denominations:
+ * {1, 5, 10, 20}.
+ */
 public class LimitedTellerMachine implements TellerMachine {
 
   private final Map<Integer, Integer> cash;
-  private static final int[] AVAILABLE_DENOMINATIONS = {1, 5, 10, 20};
   private static final int[] DENOMINATIONS_DESC = {20, 10, 5, 1};
 
+  /**
+   * Constructor for limitedTellerMachine.
+   * Sets all denominations to have quantity 0 to begin.
+   */
   public LimitedTellerMachine() {
     cash = new HashMap<>();
-    for (int denomination: AVAILABLE_DENOMINATIONS) {
+    for (int denomination: DENOMINATIONS_DESC) {
       cash.put(denomination, 0);
     }
   }
@@ -23,7 +30,7 @@ public class LimitedTellerMachine implements TellerMachine {
    * @return a boolean stating if denomination is valid.
    */
   private boolean isInvalidDenomination(int denomination) {
-    for (int availableDenomination: AVAILABLE_DENOMINATIONS) {
+    for (int availableDenomination: DENOMINATIONS_DESC) {
       if (availableDenomination == denomination) {
         return false;
       }
@@ -32,15 +39,15 @@ public class LimitedTellerMachine implements TellerMachine {
   }
 
   /**
-   * Converts money in given cash to smaller denomination.
-   * returns boolean to denote whether or not it was successful.
+   * Converts money in given cash (Map) to smaller denomination.
+   * returns boolean to denote whether it was successful.
    * @param denomination the desired denomination to convert to.
    * @param amountNeeded the total cash you need (denomination * quantity).
    * @param tempCash the current cash you have.
    * @return true if you can convert it, false otherwise.
    */
   private boolean convertDenomination(int denomination, int amountNeeded,
-      HashMap<Integer, Integer> tempCash) {
+      Map<Integer, Integer> tempCash) {
     System.out.println("Converting denomination " + denomination + " to amount needed "
         + amountNeeded);
 
@@ -54,12 +61,9 @@ public class LimitedTellerMachine implements TellerMachine {
       System.out.println(neededDenominations);
       int largerIndex = i - 1;
       if (largerIndex < 0) {
-
         return false;
       }
-
       int largerDenomination = DENOMINATIONS_DESC[i - 1];
-
       int currentDenomination = DENOMINATIONS_DESC[i];
       int currentAmountNeeded = neededDenominations.getOrDefault(currentDenomination, 0)
           * currentDenomination;
@@ -91,15 +95,20 @@ public class LimitedTellerMachine implements TellerMachine {
         tempCash.put(nextDenomination, tempCash.getOrDefault(nextDenomination, 0) + totalNextMade);
         System.out.println(tempCash);
       }
-
     }
-    tempCash.put(denomination, tempCash.getOrDefault(denomination, 0) - numberNeeded);
-    System.out.println(tempCash + " Temp cash");
     return true;
   }
 
+  /**
+   * Attempts to withdraw the denomination of a certain quantity.
+   * If it can't, it will convert change.
+   * @param denomination the denomination to be withdrawn.
+   * @param quantity the number of bills to take out.
+   * @param tempCash a map representing the current machine's inventory
+   * @return a boolean representing whether cash can be taken out.
+   */
   private boolean withdrawDenomination(int denomination, int quantity,
-      HashMap<Integer, Integer> tempCash) {
+      Map<Integer, Integer> tempCash) {
 
     System.out.println("Withdrawing denomination " + denomination + " to quantity " + quantity);
     int availableAmount = tempCash.getOrDefault(denomination, 0);
@@ -111,7 +120,12 @@ public class LimitedTellerMachine implements TellerMachine {
     }
 
     int amountNeeded = denomination * (quantity - availableAmount);
-    return convertDenomination(denomination, amountNeeded, tempCash);
+    if (convertDenomination(denomination, amountNeeded, tempCash)) {
+      tempCash.put(denomination, tempCash.get(denomination) - quantity);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -119,8 +133,8 @@ public class LimitedTellerMachine implements TellerMachine {
     if (request.length == 0) return true;
     if (request.length % 2 != 0) return false;
 
-    HashMap<Integer, Integer> tempCash = new HashMap<>(cash);
-    HashMap<Integer, Integer> requestMap = new HashMap<>();
+    Map<Integer, Integer> tempCash = new HashMap<>(cash);
+    Map<Integer, Integer> requestMap = new HashMap<>();
 
     for (int i = 0; i < request.length; i += 2) {
       int denomination = request[i];
@@ -161,11 +175,8 @@ public class LimitedTellerMachine implements TellerMachine {
     }
   }
 
-
-
   @Override
   public int getQuantity(int denomination) {
-
     return cash.getOrDefault(denomination, 0);
   }
 }
