@@ -4,9 +4,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+import teller.LimitedTellerMachine;
 
 /**
- * Test to test all public methods in LimitedTellerMachine which implements its methods from
+ * Test to test all public methods in teller.LimitedTellerMachine which implements its methods from
  * TellerMachine Interface.
  */
 public class LimitedTellerMachineTest {
@@ -429,7 +430,6 @@ public class LimitedTellerMachineTest {
 
   /**
    * Tests the getQuantity method.
-   *
    * Ensures it returns 0 for invalid denominations.
    * Ensures it returns 0 when constructor is called.
    * Ensures it returns the correct output after a deposit is made.

@@ -15,8 +15,8 @@ public interface TellerMachine {
    *                or obj.deposit(new int[]{1,10,2,20})
    *                A call to this method with no parameters does nothing.
    * @throws IllegalArgumentException if there are an odd number of numbers specified,
-   * any denomination given is not supported by this src.main.teller, or
-   * any quantity is negative
+   *                                  any denomination given is not supported by this
+   *                                  src.main.teller, or any quantity is negative
    */
   void deposit(int...deposit) throws IllegalArgumentException;
 
@@ -32,7 +32,6 @@ public interface TellerMachine {
    * by using bigger denominations available in the src.main.teller.
    * @param request several pairs of numbers (denomination, quantity) that
    *                represent the requested amount of change.
-
    *                Denominators are in no specific order.
    * @return true if the request can be fulfilled, false otherwise.
    */
@@ -42,7 +41,7 @@ public interface TellerMachine {
    * Return the number of notes/coins in this src.main.teller of the specified denomination.
    * @param denomination the denomination whose quantity is requested
    * @return the quantity of the specified denomination in this src.main.teller. If the
-   * denomination is not supported by this src.main.teller, this method returns 0
+   *         denomination is not supported by this src.main.teller, this method returns 0
    */
   int getQuantity(int denomination);
 }

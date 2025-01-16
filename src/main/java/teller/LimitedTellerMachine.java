@@ -1,8 +1,9 @@
+package teller;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import teller.TellerMachine;
 
 /**
  * Class that represents a limited teller machine. This machine only accepts these denominations:
@@ -15,7 +16,7 @@ public class LimitedTellerMachine implements TellerMachine {
 
   /**
    * Constructor for limitedTellerMachine.
-   * Sets all denominations to have quantity 0 to begin.
+   * Sets all denominations to have quantity 0.
    */
   public LimitedTellerMachine() {
     cash = new HashMap<>();
@@ -83,16 +84,16 @@ public class LimitedTellerMachine implements TellerMachine {
       int currentDenomination = DENOMINATIONS_DESC[i];
       int nextDenomination = DENOMINATIONS_DESC[i + 1];
 
-      int nextAmountNeeded = neededDenominations.getOrDefault(nextDenomination, 0) * nextDenomination;
+      int nextAmountNeeded =
+          neededDenominations.getOrDefault(nextDenomination, 0) * nextDenomination;
       if (nextAmountNeeded > 0) {
-        System.out.println("NA " + nextDenomination + " " + currentDenomination + " " + nextAmountNeeded);
-        System.out.println(nextDenomination);
         int quantityNeeded = (int) Math.ceil((double) nextAmountNeeded / currentDenomination);
-        System.out.println(quantityNeeded);
-        tempCash.put(currentDenomination, tempCash.getOrDefault(currentDenomination, 0) - quantityNeeded);
+        tempCash.put(currentDenomination, tempCash.getOrDefault(currentDenomination, 0)
+            - quantityNeeded);
         int totalNextMade = (currentDenomination / nextDenomination) * quantityNeeded;
         System.out.println(totalNextMade);
-        tempCash.put(nextDenomination, tempCash.getOrDefault(nextDenomination, 0) + totalNextMade);
+        tempCash.put(nextDenomination, tempCash.getOrDefault(nextDenomination, 0)
+            + totalNextMade);
         System.out.println(tempCash);
       }
     }
@@ -130,8 +131,12 @@ public class LimitedTellerMachine implements TellerMachine {
 
   @Override
   public boolean withdraw(int... request) {
-    if (request.length == 0) return true;
-    if (request.length % 2 != 0) return false;
+    if (request.length == 0) {
+      return true;
+    }
+    if (request.length % 2 != 0) {
+      return false;
+    }
 
     Map<Integer, Integer> tempCash = new HashMap<>(cash);
     Map<Integer, Integer> requestMap = new HashMap<>();
@@ -140,7 +145,9 @@ public class LimitedTellerMachine implements TellerMachine {
       int denomination = request[i];
       int quantity = request[i + 1];
 
-      if (isInvalidDenomination(denomination) || quantity < 0) return false;
+      if (isInvalidDenomination(denomination) || quantity < 0) {
+        return false;
+      }
       requestMap.put(denomination, requestMap.getOrDefault(denomination, 0) + quantity);
 
     }
@@ -148,7 +155,9 @@ public class LimitedTellerMachine implements TellerMachine {
       int quantity = requestMap.getOrDefault(denomination, 0);
       if (quantity > 0) {
         boolean result = withdrawDenomination(denomination, quantity, tempCash);
-        if (!result) return false;
+        if (!result) {
+          return false;
+        }
       }
     }
     cash.clear();
