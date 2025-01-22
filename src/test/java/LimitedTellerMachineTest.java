@@ -30,8 +30,6 @@ public class LimitedTellerMachineTest {
     assertEquals(0, atm.getQuantity(5));
     assertEquals(0, atm.getQuantity(10));
     assertEquals(0, atm.getQuantity(20));
-
-
   }
 
   /**
@@ -123,6 +121,8 @@ public class LimitedTellerMachineTest {
     assertEquals(0, tellerMachine.getQuantity(5));
     assertEquals(0, tellerMachine.getQuantity(10));
     assertEquals(0, tellerMachine.getQuantity(20));
+
+
   }
 
   /**
@@ -139,7 +139,7 @@ public class LimitedTellerMachineTest {
 
   /**
    * Tests that multiple deposits in the same request works as expected. It should update all
-   * of the quantities accordingly.
+   * the quantities accordingly.
    */
   @Test
   public void testMultipleDeposit() {
@@ -206,6 +206,18 @@ public class LimitedTellerMachineTest {
   }
 
   /**
+   * Test depositing greater than Integer.max_value.
+   */
+  @Test
+  public void testWithdrawWithSameDenominationMultipleBreaks() {
+    tellerMachine.deposit(5, 1, 10, 2, 20, 3);
+    assertTrue(tellerMachine.withdraw(5, 2, 10, 1, 20, 2));
+    assertEquals(1, tellerMachine.getQuantity(5));
+    assertEquals(0, tellerMachine.getQuantity(10));
+    assertEquals(1, tellerMachine.getQuantity(20));
+  }
+
+  /**
    * Tests that a withdrawal of no parameter returns true, and the teller's cash remains the same.
    */
   @Test
@@ -253,9 +265,26 @@ public class LimitedTellerMachineTest {
     assertEquals(0, tellerMachine.getQuantity(1));
     assertEquals(10, tellerMachine.getQuantity(5));
 
-    tellerMachine.withdraw(1, 50);
+    assertTrue(tellerMachine.withdraw(1, 50));
     assertEquals(0, tellerMachine.getQuantity(1));
     assertEquals(0, tellerMachine.getQuantity(5));
+
+    tellerMachine.deposit(5, 10);
+    assertFalse(tellerMachine.withdraw(1, 51));
+  }
+
+  /**
+   * Test for mutationCoverage. Makes sure that if quantity needed of denomination is exactly 1,
+   * it correctly converts.
+   */
+  @Test
+  public void testWithdrawExactBoundaries() {
+    tellerMachine.deposit(10, 1);
+    assertTrue(tellerMachine.withdraw(1, 1));
+
+    assertEquals(4, tellerMachine.getQuantity(1));  // Should have 4 $1s left
+    assertEquals(1, tellerMachine.getQuantity(5));
+    assertEquals(0, tellerMachine.getQuantity(10));  // $5 should be broken down
   }
 
   /**
@@ -390,6 +419,21 @@ public class LimitedTellerMachineTest {
     assertEquals(3, tellerMachine.getQuantity(20));
   }
 
+  /**
+   * verifies that withdrawing the same denomination works as expected.
+   */
+  @Test
+  public void testWithdrawWithMultipleSameDenominations() {
+    tellerMachine.deposit(1, 5, 5, 10, 10, 1, 20, 1);
+    assertTrue(tellerMachine.withdraw(1, 3, 1, 1));
+    assertEquals(1, tellerMachine.getQuantity(1));
+
+    assertFalse(tellerMachine.withdraw(20, 1, 20, 2));
+
+    assertTrue(tellerMachine.withdraw(1, 3, 1, 1));
+    assertEquals(2, tellerMachine.getQuantity(1));
+    assertEquals(9, tellerMachine.getQuantity(5));
+  }
 
   /**
    * Tests the example given in the assignment. Tests that the order is correct, and that it

@@ -49,8 +49,9 @@ public class LimitedTellerMachine implements TellerMachine {
    */
   private boolean convertDenomination(int denomination, int amountNeeded,
       Map<Integer, Integer> tempCash) {
-    System.out.println("Converting denomination " + denomination + " to amount needed "
-        + amountNeeded);
+    if (amountNeeded == 0) {
+      return false;
+    }
 
     Map<Integer, Integer> neededDenominations = new HashMap<>();
     int numberNeeded = amountNeeded / denomination;
@@ -59,7 +60,6 @@ public class LimitedTellerMachine implements TellerMachine {
         .indexOf(denomination);
 
     for (int i = currentIndex; i >= 0; i--) {
-      System.out.println(neededDenominations);
       int largerIndex = i - 1;
       if (largerIndex < 0) {
         return false;
@@ -80,21 +80,18 @@ public class LimitedTellerMachine implements TellerMachine {
       }
     }
     for (int i = 0; i < DENOMINATIONS_DESC.length - 1; i++) {
-      System.out.println("in for loop " + i);
       int currentDenomination = DENOMINATIONS_DESC[i];
       int nextDenomination = DENOMINATIONS_DESC[i + 1];
 
       int nextAmountNeeded =
           neededDenominations.getOrDefault(nextDenomination, 0) * nextDenomination;
-      if (nextAmountNeeded > 0) {
+      if (nextAmountNeeded >= 1) {
         int quantityNeeded = (int) Math.ceil((double) nextAmountNeeded / currentDenomination);
         tempCash.put(currentDenomination, tempCash.getOrDefault(currentDenomination, 0)
             - quantityNeeded);
         int totalNextMade = (currentDenomination / nextDenomination) * quantityNeeded;
-        System.out.println(totalNextMade);
         tempCash.put(nextDenomination, tempCash.getOrDefault(nextDenomination, 0)
             + totalNextMade);
-        System.out.println(tempCash);
       }
     }
     return true;
@@ -110,12 +107,9 @@ public class LimitedTellerMachine implements TellerMachine {
    */
   private boolean withdrawDenomination(int denomination, int quantity,
       Map<Integer, Integer> tempCash) {
-
-    System.out.println("Withdrawing denomination " + denomination + " to quantity " + quantity);
     int availableAmount = tempCash.getOrDefault(denomination, 0);
 
     if (availableAmount >= quantity) {
-      System.out.println("Enough available denomination " + denomination);
       tempCash.put(denomination, availableAmount - quantity);
       return true;
     }
@@ -153,14 +147,13 @@ public class LimitedTellerMachine implements TellerMachine {
     }
     for (int denomination: DENOMINATIONS_DESC) {
       int quantity = requestMap.getOrDefault(denomination, 0);
-      if (quantity > 0) {
+      if (quantity >= 1) {
         boolean result = withdrawDenomination(denomination, quantity, tempCash);
         if (!result) {
           return false;
         }
       }
     }
-    cash.clear();
     cash.putAll(tempCash);
     return true;
   }
