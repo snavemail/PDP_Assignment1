@@ -14,6 +14,9 @@ public class LimitedTellerMachineTest {
 
   private LimitedTellerMachine tellerMachine;
 
+  /**
+   * Sets up the tests by creating a tellerMachine with no denominations.
+   */
   @Before
   public void setUp() {
     tellerMachine = new LimitedTellerMachine();
@@ -420,7 +423,7 @@ public class LimitedTellerMachineTest {
   }
 
   /**
-   * verifies that withdrawing the same denomination works as expected.
+   * Verifies that withdrawing the same denomination works as expected.
    */
   @Test
   public void testWithdrawWithMultipleSameDenominations() {
@@ -473,28 +476,37 @@ public class LimitedTellerMachineTest {
   }
 
   /**
-   * Tests the getQuantity method.
-   * Ensures it returns 0 for invalid denominations.
-   * Ensures it returns 0 when constructor is called.
-   * Ensures it returns the correct output after a deposit is made.
+   * Tests that if there is any invalid denomination, it returns 0.
+   * Invalid is not 1, 5, 10, 20 which include, but not limited to:
+   * 0, negative numbers, and positive numbers not in the aforementioned list.
    */
   @Test
-  public void getQuantity() {
-    // Returns 0 if denomination is not valid.
+  public void getInvalidQuantity() {
+    tellerMachine.deposit(1, 5, 5, 5, 10, 5, 20, 5);
     assertEquals(0, tellerMachine.getQuantity(2));
     assertEquals(0, tellerMachine.getQuantity(3));
     assertEquals(0, tellerMachine.getQuantity(4));
     assertEquals(0, tellerMachine.getQuantity(-1));
     assertEquals(0, tellerMachine.getQuantity(0));
     assertEquals(0, tellerMachine.getQuantity(100));
+  }
 
-    // Initially the denominations are all set to 0.
+  /**
+   * Verifies that get quantity correctly returns the initial amounts for each denomination.
+   */
+  @Test
+  public void getInitialDenominations() {
     assertEquals(0, tellerMachine.getQuantity(1));
     assertEquals(0, tellerMachine.getQuantity(5));
     assertEquals(0, tellerMachine.getQuantity(10));
     assertEquals(0, tellerMachine.getQuantity(20));
+  }
 
-    // Adds 1 10 and 2 20s.
+  /**
+   * Verifies that after depositing valid denominations, get quantity returns the correct number.
+   */
+  @Test
+  public void getValidDenominations() {
     tellerMachine.deposit(10, 1, 20, 2);
     assertEquals(0, tellerMachine.getQuantity(1));
     assertEquals(0, tellerMachine.getQuantity(5));
@@ -503,6 +515,12 @@ public class LimitedTellerMachineTest {
 
     tellerMachine.deposit(5, 2, 20, 10);
     assertEquals(0, tellerMachine.getQuantity(1));
+    assertEquals(2, tellerMachine.getQuantity(5));
+    assertEquals(1, tellerMachine.getQuantity(10));
+    assertEquals(12, tellerMachine.getQuantity(20));
+
+    tellerMachine.deposit(1, 10);
+    assertEquals(10, tellerMachine.getQuantity(1));
     assertEquals(2, tellerMachine.getQuantity(5));
     assertEquals(1, tellerMachine.getQuantity(10));
     assertEquals(12, tellerMachine.getQuantity(20));
